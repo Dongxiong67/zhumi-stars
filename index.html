@@ -4,429 +4,386 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>猪咪的星星收藏册</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&family=ZCOOL+XiaoWei&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Noto+Serif+SC:wght@200;300;400;500;600&display=swap" rel="stylesheet">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   :root {
-    --gold: #f4d58d;
-    --gold-light: #ffe8b3;
-    --pink: #f8b4b4;
-    --pink-light: #ffd6d6;
-    --cream: #fdf6ec;
+    --bg: #0e0e14;
+    --bg-soft: #16161f;
+    --gold: #c9a96e;
+    --gold-light: #e8d5a8;
+    --gold-dim: #8a7348;
+    --text: #e8e4dc;
+    --text-dim: #8a8680;
+    --line: rgba(201, 169, 110, 0.15);
   }
   html { scroll-behavior: smooth; }
   body {
-    font-family: 'Noto Serif SC', serif;
-    background: linear-gradient(180deg, #1a1a2e 0%, #16213e 20%, #0f3460 40%, #533483 60%, #8e4585 80%, #c06c84 100%);
-    color: var(--cream);
+    font-family: 'Noto Serif SC', 'Cormorant Garamond', serif;
+    background: var(--bg);
+    color: var(--text);
     min-height: 100vh;
     overflow-x: hidden;
-    position: relative;
+    line-height: 1.8;
+    -webkit-font-smoothing: antialiased;
   }
-  .stars-container {
+  .noise {
     position: fixed; top: 0; left: 0;
     width: 100%; height: 100%;
-    pointer-events: none; z-index: 0; overflow: hidden;
+    pointer-events: none; z-index: 1; opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .vignette {
+    position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none; z-index: 1;
+    background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.5) 100%);
+  }
+  .stars {
+    position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none; z-index: 0;
   }
   .star {
-    position: absolute; background: #fff; border-radius: 50%;
-    animation: twinkle var(--duration) infinite ease-in-out;
-    box-shadow: 0 0 6px rgba(255,255,255,0.8);
+    position: absolute; background: var(--gold-light);
+    border-radius: 50%; opacity: 0;
+    animation: starFade var(--dur) infinite ease-in-out;
   }
-  @keyframes twinkle {
-    0%, 100% { opacity: 0.2; transform: scale(0.8); }
-    50% { opacity: 1; transform: scale(1.3); }
+  @keyframes starFade {
+    0%, 100% { opacity: 0; transform: scale(0.5); }
+    50% { opacity: var(--max-op); transform: scale(1); }
   }
-  .meteor {
-    position: absolute; width: 2px; height: 2px;
-    background: linear-gradient(45deg, #fff, transparent);
-    border-radius: 50%; animation: meteor 8s infinite linear; opacity: 0;
-  }
-  .meteor::after {
-    content: ''; position: absolute; top: 0; left: 0;
-    width: 80px; height: 1px;
-    background: linear-gradient(90deg, #fff, transparent);
-    transform: rotate(-45deg) translateX(-40px);
-  }
-  @keyframes meteor {
-    0% { transform: translate(0, 0) rotate(-45deg); opacity: 0; }
-    10% { opacity: 1; }
-    40% { opacity: 1; }
-    50% { transform: translate(-400px, 400px) rotate(-45deg); opacity: 0; }
-    100% { opacity: 0; }
-  }
-  .moon {
-    position: fixed; top: 8%; right: 8%;
-    width: 100px; height: 100px;
-    background: radial-gradient(circle at 35% 35%, #fff8e7, #f4d58d 60%, #e8c56b);
-    border-radius: 50%;
-    box-shadow: 0 0 40px rgba(244, 213, 141, 0.6), 0 0 80px rgba(244, 213, 141, 0.3), inset -10px -10px 30px rgba(0,0,0,0.1);
-    z-index: 1; animation: moonGlow 4s ease-in-out infinite;
-  }
-  @keyframes moonGlow {
-    0%, 100% { box-shadow: 0 0 40px rgba(244, 213, 141, 0.6), 0 0 80px rgba(244, 213, 141, 0.3); }
-    50% { box-shadow: 0 0 60px rgba(244, 213, 141, 0.8), 0 0 120px rgba(244, 213, 141, 0.4); }
+  .container {
+    position: relative; z-index: 2;
+    max-width: 720px; margin: 0 auto; padding: 0 2rem;
   }
   .hero {
-    position: relative; z-index: 2;
-    min-height: 100vh;
-    display: flex; flex-direction: column;
-    justify-content: center; align-items: center;
-    text-align: center; padding: 2rem;
+    min-height: 100vh; display: flex; flex-direction: column;
+    justify-content: center; align-items: center; text-align: center;
+    padding: 4rem 2rem; position: relative;
   }
-  .hero::before {
-    content: ''; position: absolute; top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    width: 500px; height: 500px;
-    background: radial-gradient(circle, rgba(244, 213, 141, 0.1) 0%, transparent 70%);
-    border-radius: 50%; pointer-events: none;
-  }
-  .hero .ornament {
-    font-size: 1.5rem; color: var(--gold);
-    margin-bottom: 1.5rem; letter-spacing: 1rem;
-    animation: fadeIn 2s ease-out;
+  .hero .mark {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.85rem; letter-spacing: 0.5em;
+    color: var(--gold-dim); text-transform: uppercase;
+    margin-bottom: 3rem; font-weight: 300;
   }
   .hero h1 {
-    font-family: 'Ma Shan Zheng', cursive;
-    font-size: clamp(3rem, 10vw, 6rem);
-    color: var(--gold-light);
-    text-shadow: 0 0 30px rgba(244, 213, 141, 0.5), 0 2px 10px rgba(0,0,0,0.3);
-    margin-bottom: 1rem; animation: fadeInUp 1.5s ease-out; letter-spacing: 0.1em;
-  }
-  .hero .subtitle {
-    font-family: 'ZCOOL XiaoWei', serif;
-    font-size: clamp(1.1rem, 3vw, 1.5rem);
-    color: var(--pink-light); margin-bottom: 3rem;
-    letter-spacing: 0.3em; animation: fadeInUp 1.5s ease-out 0.3s both;
+    font-family: 'Noto Serif SC', serif;
+    font-size: clamp(2.2rem, 6vw, 3.5rem);
+    font-weight: 300; color: var(--gold-light);
+    letter-spacing: 0.15em; margin-bottom: 2rem; line-height: 1.4;
   }
   .hero .divider {
-    width: 100px; height: 1px;
-    background: linear-gradient(90deg, transparent, var(--gold), transparent);
-    margin-bottom: 2rem; animation: fadeIn 2s ease-out 0.6s both;
+    width: 40px; height: 1px; background: var(--gold);
+    margin: 2rem 0; opacity: 0.5;
+  }
+  .hero .en-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1rem; font-style: italic;
+    color: var(--text-dim); letter-spacing: 0.2em; font-weight: 300;
   }
   .hero .quote {
-    font-size: clamp(0.95rem, 2.5vw, 1.15rem);
-    color: var(--cream); font-style: italic;
-    max-width: 550px; line-height: 2.2; opacity: 0.9;
-    animation: fadeInUp 1.5s ease-out 0.9s both;
+    margin-top: 4rem; font-size: 0.95rem;
+    color: var(--text-dim); font-style: italic;
+    max-width: 400px; line-height: 2.2; font-weight: 300;
   }
-  .scroll-hint {
+  .scroll-indicator {
     position: absolute; bottom: 3rem; left: 50%;
-    transform: translateX(-50%); color: var(--gold);
-    animation: bounce 2s infinite; font-size: 0.85rem;
-    letter-spacing: 0.2em; opacity: 0.8;
+    transform: translateX(-50%); display: flex;
+    flex-direction: column; align-items: center; gap: 0.8rem;
   }
-  .scroll-hint::after {
-    content: '↓'; display: block; text-align: center;
-    margin-top: 0.5rem; font-size: 1.2rem;
+  .scroll-indicator .line {
+    width: 1px; height: 40px;
+    background: linear-gradient(180deg, var(--gold), transparent);
+    animation: scrollLine 2s infinite;
   }
-  @keyframes bounce {
-    0%, 100% { transform: translateX(-50%) translateY(0); }
-    50% { transform: translateX(-50%) translateY(10px); }
+  @keyframes scrollLine {
+    0% { transform: scaleY(0); transform-origin: top; }
+    50% { transform: scaleY(1); transform-origin: top; }
+    51% { transform-origin: bottom; }
+    100% { transform: scaleY(0); transform-origin: bottom; }
   }
-  @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(40px); }
-    to { opacity: 1; transform: translateY(0); }
+  .scroll-indicator span {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.7rem; letter-spacing: 0.3em;
+    color: var(--gold-dim); text-transform: uppercase;
   }
-  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-  .section {
-    position: relative; z-index: 2;
-    padding: 6rem 2rem; max-width: 1100px; margin: 0 auto;
+  .chapter { padding: 6rem 0; position: relative; }
+  .chapter-header { text-align: center; margin-bottom: 4rem; }
+  .chapter-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.75rem; letter-spacing: 0.5em;
+    color: var(--gold-dim); text-transform: uppercase;
+    margin-bottom: 1.5rem; font-weight: 300;
   }
-  .section-header { text-align: center; margin-bottom: 4rem; }
-  .section-header .chapter-num {
-    font-family: 'ZCOOL XiaoWei', serif;
-    font-size: 0.9rem; color: var(--pink);
-    letter-spacing: 0.5em; margin-bottom: 1rem;
+  .chapter-title {
+    font-family: 'Noto Serif SC', serif;
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    font-weight: 300; color: var(--gold-light);
+    letter-spacing: 0.2em; margin-bottom: 1.5rem;
   }
-  .section-header h2 {
-    font-family: 'Ma Shan Zheng', cursive;
-    font-size: clamp(2rem, 5vw, 3rem);
-    color: var(--gold-light); margin-bottom: 1rem;
-    text-shadow: 0 0 20px rgba(244, 213, 141, 0.3);
+  .chapter-line {
+    width: 30px; height: 1px; background: var(--gold);
+    margin: 0 auto; opacity: 0.4;
   }
-  .section-header .line {
-    width: 60px; height: 2px;
-    background: linear-gradient(90deg, transparent, var(--gold), transparent);
-    margin: 0 auto;
+  .memory {
+    padding: 2.5rem 0; border-bottom: 1px solid var(--line);
+    opacity: 0; transform: translateY(20px);
+    transition: opacity 1s ease, transform 1s ease;
   }
-  .stars-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
+  .memory:last-child { border-bottom: none; }
+  .memory.visible { opacity: 1; transform: translateY(0); }
+  .memory-date {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.8rem; color: var(--gold-dim);
+    letter-spacing: 0.2em; margin-bottom: 1rem; font-weight: 300;
   }
-  .star-card {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);
-    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(244, 213, 141, 0.2);
-    border-radius: 24px; padding: 2.2rem;
-    cursor: pointer; transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative; overflow: hidden;
-    opacity: 0; transform: translateY(40px);
+  .memory-title {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.2rem; font-weight: 400;
+    color: var(--gold-light); margin-bottom: 1.2rem; letter-spacing: 0.05em;
   }
-  .star-card.visible { opacity: 1; transform: translateY(0); }
-  .star-card::before {
-    content: '✦'; position: absolute; top: 1.2rem; right: 1.5rem;
-    font-size: 1.2rem; color: var(--gold); opacity: 0.4; transition: all 0.3s;
+  .memory-text {
+    font-size: 0.95rem; color: var(--text);
+    line-height: 2.2; font-weight: 300;
   }
-  .star-card:hover {
-    transform: translateY(-8px);
-    border-color: rgba(244, 213, 141, 0.5);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 40px rgba(244, 213, 141, 0.15);
+  .memory-text p { margin-bottom: 1rem; }
+  .memory-text p:last-child { margin-bottom: 0; }
+  .memory-quote {
+    border-left: 2px solid var(--gold);
+    padding-left: 1.5rem; margin: 1.5rem 0;
+    font-style: italic; color: var(--text-dim); font-size: 0.9rem;
   }
-  .star-card:hover::before { opacity: 1; transform: rotate(180deg); }
-  .star-card .date {
-    font-family: 'ZCOOL XiaoWei', serif;
-    font-size: 0.85rem; color: var(--pink);
-    margin-bottom: 0.8rem; letter-spacing: 0.1em;
-  }
-  .star-card .title {
-    font-family: 'Ma Shan Zheng', cursive;
-    font-size: 1.4rem; color: var(--gold-light);
-    margin-bottom: 1rem; font-weight: normal;
-  }
-  .star-card .preview {
-    font-size: 0.95rem; color: var(--cream);
-    opacity: 0.75; line-height: 1.9;
-  }
-  .star-card .full-story {
-    max-height: 0; overflow: hidden;
-    transition: max-height 0.6s ease, margin 0.3s ease, padding 0.3s ease;
-    font-size: 0.95rem; line-height: 2.1; color: var(--cream);
-  }
-  .star-card.open .full-story {
-    max-height: 500px; margin-top: 1.2rem; padding-top: 1.2rem;
-    border-top: 1px solid rgba(244, 213, 141, 0.2);
-  }
-  .star-card .hint {
-    font-size: 0.75rem; color: var(--gold); opacity: 0.5;
-    margin-top: 1rem; text-align: right; transition: opacity 0.3s;
-  }
-  .star-card.open .hint { opacity: 0; }
   .ending {
-    position: relative; z-index: 2;
-    padding: 8rem 2rem; text-align: center;
-    background: linear-gradient(180deg, transparent 0%, rgba(248, 180, 180, 0.1) 50%, rgba(244, 213, 141, 0.1) 100%);
+    padding: 8rem 0; text-align: center; position: relative;
   }
-  .ending .ornament {
-    font-size: 2rem; color: var(--gold);
-    margin-bottom: 2rem; letter-spacing: 0.5em;
+  .ending::before {
+    content: ''; position: absolute; top: 0; left: 50%;
+    transform: translateX(-50%); width: 1px; height: 60px;
+    background: linear-gradient(180deg, transparent, var(--gold-dim));
+  }
+  .ending .mark {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.8rem; letter-spacing: 0.5em;
+    color: var(--gold-dim); text-transform: uppercase;
+    margin-bottom: 3rem; font-weight: 300;
   }
   .ending h2 {
-    font-family: 'Ma Shan Zheng', cursive;
-    font-size: clamp(2rem, 5vw, 3rem);
-    color: var(--pink-light); margin-bottom: 2.5rem;
-    text-shadow: 0 0 20px rgba(248, 180, 180, 0.3);
+    font-family: 'Noto Serif SC', serif;
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    font-weight: 300; color: var(--gold-light);
+    letter-spacing: 0.15em; margin-bottom: 3rem;
   }
   .ending p {
-    font-size: clamp(1rem, 2.5vw, 1.2rem);
-    line-height: 2.5; max-width: 650px;
-    margin: 0 auto 1.5rem; color: var(--cream); opacity: 0.95;
+    font-size: 0.95rem; color: var(--text);
+    line-height: 2.5; margin-bottom: 1.5rem; font-weight: 300;
+    max-width: 500px; margin-left: auto; margin-right: auto;
   }
   .ending .wish {
-    margin-top: 4rem; font-family: 'ZCOOL XiaoWei', serif;
-    font-size: 1.15rem; color: var(--gold-light);
-    font-style: italic; line-height: 2.5; letter-spacing: 0.1em;
+    margin-top: 4rem; font-family: 'Cormorant Garamond', serif;
+    font-size: 1.05rem; font-style: italic;
+    color: var(--gold); line-height: 2.5;
+    letter-spacing: 0.05em; font-weight: 300;
   }
-  .ending .footer {
-    margin-top: 4rem; font-size: 0.8rem;
-    color: var(--cream); opacity: 0.4; letter-spacing: 0.2em;
+  .ending .signature {
+    margin-top: 5rem; font-family: 'Cormorant Garamond', serif;
+    font-size: 0.8rem; color: var(--text-dim);
+    letter-spacing: 0.3em; font-weight: 300;
   }
-  .floating-heart {
-    position: fixed; bottom: -50px; font-size: 1.5rem;
-    animation: floatUp 15s infinite linear; z-index: 1; opacity: 0;
+  @media (max-width: 600px) {
+    .container { padding: 0 1.5rem; }
+    .chapter { padding: 4rem 0; }
+    .memory { padding: 2rem 0; }
+    .ending { padding: 6rem 0; }
   }
-  @keyframes floatUp {
-    0% { transform: translateY(0) rotate(0deg); opacity: 0; }
-    10% { opacity: 0.6; }
-    90% { opacity: 0.6; }
-    100% { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
+  ::selection {
+    background: rgba(201, 169, 110, 0.3);
+    color: var(--gold-light);
   }
-  @media (max-width: 768px) {
-    .stars-grid { grid-template-columns: 1fr; }
-    .moon { width: 60px; height: 60px; top: 5%; right: 5%; }
-    .section { padding: 4rem 1.5rem; }
-    .star-card { padding: 1.8rem; }
-  }
-  ::-webkit-scrollbar { width: 8px; }
-  ::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
-  ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, var(--gold), var(--pink)); border-radius: 4px; }
 </style>
 </head>
 <body>
-<div class="stars-container" id="starsContainer"></div>
-<div class="moon"></div>
-<div class="floating-heart" style="left: 10%; animation-delay: 0s;">✨</div>
-<div class="floating-heart" style="left: 30%; animation-delay: 3s;">💫</div>
-<div class="floating-heart" style="left: 50%; animation-delay: 6s;">⭐</div>
-<div class="floating-heart" style="left: 70%; animation-delay: 9s;">✨</div>
-<div class="floating-heart" style="left: 90%; animation-delay: 12s;">💫</div>
+<div class="stars" id="stars"></div>
+<div class="noise"></div>
+<div class="vignette"></div>
 <section class="hero">
-  <div class="ornament">✦ ✧ ✦</div>
+  <div class="mark">A Collection of Stars</div>
   <h1>猪咪的星星收藏册</h1>
-  <p class="subtitle">那 些 被 风 记 住 的 日 子</p>
   <div class="divider"></div>
-  <p class="quote">"每个人都是一颗星星，<br>而有些相遇，是星星之间的引力。<br>我把这些日子折成纸飞机，<br>让它们在夜空中闪闪发光。"</p>
-  <div class="scroll-hint">向下滑动 收集星星</div>
-</section>
-<section class="section">
-  <div class="section-header">
-    <div class="chapter-num">CHAPTER ONE</div>
-    <h2>初遇的光</h2>
+  <div class="en-title">Those Days Remembered by the Wind</div>
+  <p class="quote">"每个人都是一颗星星，<br>而有些相遇，是星星之间的引力。"</p>
+  <div class="scroll-indicator">
     <div class="line"></div>
-  </div>
-  <div class="stars-grid">
-    <div class="star-card">
-      <div class="date">2024.10.11</div>
-      <div class="title">学长好</div>
-      <div class="preview">那是一个普通的傍晚，一条消息穿越了屏幕，也穿越了后来所有的日子。</div>
-      <div class="full-story">她发来"学长好！请问能了解一下应聘督学岗位和主编岗位吗"，带着小心翼翼的礼貌。他不知道，这个问问题的女孩，会在后来的日子里，把他的世界搅得天翻地覆，又温柔得不像话。<br><br>她说"高三的时候翻重构就想大学如果有这个机会，一定要抓住"。那时候的她，眼睛里有光，对未来充满期待。而他，刚好是那个递出机会的人。</div>
-      <div class="hint">点击展开故事 ✦</div>
-    </div>
-    <div class="star-card">
-      <div class="date">2024.10.12</div>
-      <div class="title">晚安学长</div>
-      <div class="preview">第一个晚安，像一颗种子，悄悄落进了土里。</div>
-      <div class="full-story">凌晨，她说"睡啦！晚安学长"，带着一个爱心表情。他回复"说晚安我有点假 我睡前来拍拍你"。<br><br>那时候他们还只是学长和学妹，但"拍拍你"这三个字，已经超出了普通的界限。后来的无数个夜晚，他们都说晚安，而这一句，是所有晚安的开始。</div>
-      <div class="hint">点击展开故事 ✦</div>
-    </div>
-    <div class="star-card">
-      <div class="date">2024.10.13</div>
-      <div class="title">好温暖啊</div>
-      <div class="preview">她翻了他的朋友圈，说"学长阳光向上满是激情，好温暖啊"。</div>
-      <div class="full-story">她说"看得好感动……有一种找到组织的激动感不知道如何表达……"，然后又说"刚刚翻了一下你的朋友圈，学长阳光向上满是激情，好温暖啊"。<br><br>那时候的他，是她眼里的光。她不知道，后来她也会成为他的光，在他最黑暗的日子里，照亮他前行的路。</div>
-      <div class="hint">点击展开故事 ✦</div>
-    </div>
-    <div class="star-card">
-      <div class="date">2024.10.14</div>
-      <div class="title">我喜欢你认真的样子</div>
-      <div class="preview">她说"我也特别喜欢你在追求未来的样子"、"好喜欢你认真的样子"。</div>
-      <div class="full-story">那时候他们聊未来，聊梦想，聊彼此想要成为的人。她说"我也特别喜欢你在追求未来的样子"，又说"好喜欢你认真的样子"。<br><br>她喜欢的，是那个奋进的、有激情的、对未来充满希望的他。而他不知道，后来的他，会在失去她之后，才重新找回那个样子。</div>
-      <div class="hint">点击展开故事 ✦</div>
-    </div>
+    <span>Scroll</span>
   </div>
 </section>
-<section class="section">
-  <div class="section-header">
-    <div class="chapter-num">CHAPTER TWO</div>
-    <h2>并肩的暖</h2>
-    <div class="line"></div>
-  </div>
-  <div class="stars-grid">
-    <div class="star-card">
-      <div class="date">2024.10.16</div>
-      <div class="title">图书馆的沙发</div>
-      <div class="preview">"图书馆的沙发上！两个人！头靠着头睡在一起！"</div>
-      <div class="full-story">她兴奋地描述着图书馆的场景，像个发现了新大陆的孩子。那时候他们一起泡图书馆，一起学习，一起在沙发上打盹。<br><br>图书馆的沙发，见证了他们最初的亲密。头靠着头，呼吸交织，那是比任何情话都更动人的瞬间。</div>
-      <div class="hint">点击展开故事 ✦</div>
+<div class="container">
+  <section class="chapter">
+    <div class="chapter-header">
+      <div class="chapter-num">Chapter One</div>
+      <h2 class="chapter-title">初遇的光</h2>
+      <div class="chapter-line"></div>
     </div>
-    <div class="star-card">
-      <div class="date">2024.10.17</div>
-      <div class="title">理想主义的梦</div>
-      <div class="preview">"如果好好学习就能保研，天天跑跑步，去健身房，谈恋爱……"</div>
-      <div class="full-story">她描述着自己理想中的生活：保研、跑步、健身、谈恋爱、画画、搞音乐……她说"是不是很幼稚很理想主义~"。<br><br>但他知道，这不是幼稚，这是她对生活最真诚的期待。她是一个理想主义者，相信美好，相信努力，相信两个人可以一起变得更好。</div>
-      <div class="hint">点击展开故事 ✦</div>
+    <div class="memory">
+      <div class="memory-date">2024.10.11</div>
+      <h3 class="memory-title">学长好</h3>
+      <div class="memory-text">
+        <p>那是一个普通的傍晚，一条消息穿越了屏幕，也穿越了后来所有的日子。</p>
+        <div class="memory-quote">"学长好！请问能了解一下应聘督学岗位和主编岗位吗"</div>
+        <p>她带着小心翼翼的礼貌。他不知道，这个问问题的女孩，会在后来的日子里，把他的世界搅得天翻地覆，又温柔得不像话。</p>
+        <p>她说高三的时候翻重构就想，大学如果有这个机会，一定要抓住。那时候的她，眼睛里有光，对未来充满期待。而他，刚好是那个递出机会的人。</p>
+      </div>
     </div>
-    <div class="star-card">
-      <div class="date">2024.10.18</div>
-      <div class="title">突然听懂情歌</div>
-      <div class="preview">"会突然听懂很多情歌"——她这样说。</div>
-      <div class="full-story">她说"会突然听懂很多情歌"。以前听情歌只是觉得好听，现在听情歌，每一句都像是在唱自己。<br><br>喜欢一个人的时候，全世界的情歌都有了意义。她开始听懂那些以前听不懂的歌词，开始在旋律里听见自己的心跳。</div>
-      <div class="hint">点击展开故事 ✦</div>
+    <div class="memory">
+      <div class="memory-date">2024.10.12</div>
+      <h3 class="memory-title">晚安学长</h3>
+      <div class="memory-text">
+        <p>第一个晚安，像一颗种子，悄悄落进了土里。</p>
+        <div class="memory-quote">"睡啦！晚安学长" —— 凌晨，带着一个爱心表情</div>
+        <p>他回复说"说晚安我有点假，我睡前来拍拍你"。那时候他们还只是学长和学妹，但"拍拍你"这三个字，已经超出了普通的界限。</p>
+        <p>后来的无数个夜晚，他们都说晚安。而这一句，是所有晚安的开始。</p>
+      </div>
     </div>
-    <div class="star-card">
-      <div class="date">2025年的某个夜晚</div>
-      <div class="title">一起挺过来的日子</div>
-      <div class="preview">"你忘了过去的一年，我们一起挺过来的。"</div>
-      <div class="full-story">后来争吵的时候，他说"你忘了过去的一年，我们一起挺过来的"。那些日子，他们一起面对困难，一起解决问题，一起在深夜里互相打气。<br><br>那些一起挺过来的日子，不是一句话就能抹去的。它们刻在时间里，刻在彼此的生命里，成为后来无论走多远都无法否认的共同记忆。</div>
-      <div class="hint">点击展开故事 ✦</div>
+    <div class="memory">
+      <div class="memory-date">2024.10.13</div>
+      <h3 class="memory-title">好温暖啊</h3>
+      <div class="memory-text">
+        <p>她翻了他的朋友圈，然后发来一句话。</p>
+        <div class="memory-quote">"刚刚翻了一下你的朋友圈，学长阳光向上满是激情，好温暖啊"</div>
+        <p>那时候的他，是她眼里的光。她不知道，后来她也会成为他的光，在他最黑暗的日子里，照亮他前行的路。</p>
+      </div>
     </div>
-  </div>
-</section>
-<section class="section">
-  <div class="section-header">
-    <div class="chapter-num">CHAPTER THREE</div>
-    <h2>无声的爱</h2>
-    <div class="line"></div>
-  </div>
-  <div class="stars-grid">
-    <div class="star-card">
-      <div class="date">2026.07.03</div>
-      <div class="title">972元的签证费</div>
-      <div class="preview">她默默帮他付了签证费，收了又转回来。</div>
-      <div class="full-story">7月3日，她默默帮他付了签证费用，972元。他后来才发现，转账给她，她收了。但紧接着，她又把972元转回给他。<br><br>她没有说"我帮你付了"，没有说"不用还"，只是默默做了，又默默退了回来。他发现后感动地说"猪咪 好爱你呀看的我好想哭"。<br><br>最深的爱，往往是无声的。她不会说漂亮的情话，但她会用行动告诉你：我在，我帮你，不用谢。</div>
-      <div class="hint">点击展开故事 ✦</div>
+    <div class="memory">
+      <div class="memory-date">2024.10.14</div>
+      <h3 class="memory-title">我喜欢你认真的样子</h3>
+      <div class="memory-text">
+        <p>那时候他们聊未来，聊梦想，聊彼此想要成为的人。</p>
+        <div class="memory-quote">"我也特别喜欢你在追求未来的样子" "好喜欢你认真的样子"</div>
+        <p>她喜欢的，是那个奋进的、有激情的、对未来充满希望的他。而他不知道，后来的他，会在失去她之后，才重新找回那个样子。</p>
+      </div>
     </div>
-    <div class="star-card">
-      <div class="date">2026.06</div>
-      <div class="title">长春的学而思</div>
-      <div class="preview">他们一起去长春参加培训，在陌生的城市里互相依靠。</div>
-      <div class="full-story">6月的长春，他们一起去参加学而思的培训营。住酒店，一起上课，一起在陌生的城市里走走停停。<br><br>她发"来长春必须逛的地方之一 就是这有山！"，像个小导游一样兴奋。后来他朋友圈看到有人去长春的这有山，说"爱你宝宝 很想你"。<br><br>一起去过的城市，会因为有那个人，而变得不一样。长春的风，长春的雨，长春的这有山，都成了他们共同的秘密。</div>
-      <div class="hint">点击展开故事 ✦</div>
+  </section>
+  <section class="chapter">
+    <div class="chapter-header">
+      <div class="chapter-num">Chapter Two</div>
+      <h2 class="chapter-title">并肩的暖</h2>
+      <div class="chapter-line"></div>
     </div>
-    <div class="star-card">
-      <div class="date">无数个清晨</div>
-      <div class="title">偷拍的睡颜</div>
-      <div class="preview">她偷拍了他睡觉的照片，一直存着。</div>
-      <div class="full-story">7月3日的聊天记录里，她发了一张他睡觉的照片——闭着眼睛，嘴角微微上扬，睡得很安稳。<br><br>她是什么时候拍的？他不知道。但她一直存着，在某个普通的下午，发给他看。<br><br>爱一个人的时候，会忍不住偷拍他的每一个瞬间。睡觉的样子，吃饭的样子，认真做事的样子，都想存下来，在想他的时候翻出来看。</div>
-      <div class="hint">点击展开故事 ✦</div>
+    <div class="memory">
+      <div class="memory-date">2024.10.16</div>
+      <h3 class="memory-title">图书馆的沙发</h3>
+      <div class="memory-text">
+        <p>她兴奋地描述着图书馆的场景，像个发现了新大陆的孩子。</p>
+        <div class="memory-quote">"图书馆的沙发上！两个人！头靠着头睡在一起！"</div>
+        <p>那时候他们一起泡图书馆，一起学习，一起在沙发上打盹。图书馆的沙发，见证了他们最初的亲密。头靠着头，呼吸交织，那是比任何情话都更动人的瞬间。</p>
+      </div>
     </div>
-    <div class="star-card">
-      <div class="date">2026.09.13</div>
-      <div class="title">就陪你</div>
-      <div class="preview">她说"我不能说话"，但又说"就陪你"。</div>
-      <div class="full-story">9月13日，他给她打电话，她接了。她说"我不能说话"，但又说"就陪你"。<br><br>她不能说话，可能是在宿舍，可能是不方便，可能是不知道说什么。但她没有挂电话，她选择陪着他，用沉默的方式。<br><br>有些陪伴，不需要语言。她就在那里，呼吸着，存在着，对他来说，就已经足够。</div>
-      <div class="hint">点击展开故事 ✦</div>
+    <div class="memory">
+      <div class="memory-date">2024.10.17</div>
+      <h3 class="memory-title">理想主义的梦</h3>
+      <div class="memory-text">
+        <p>她描述着自己理想中的生活。</p>
+        <div class="memory-quote">"如果好好学习就能保研，天天跑跑步，去健身房，谈恋爱……是不是很幼稚很理想主义~"</div>
+        <p>但他知道，这不是幼稚，这是她对生活最真诚的期待。她是一个理想主义者，相信美好，相信努力，相信两个人可以一起变得更好。</p>
+      </div>
     </div>
-  </div>
-</section>
+    <div class="memory">
+      <div class="memory-date">2024.10.18</div>
+      <h3 class="memory-title">突然听懂情歌</h3>
+      <div class="memory-text">
+        <p>她说了一句话，很轻，却很重。</p>
+        <div class="memory-quote">"会突然听懂很多情歌"</div>
+        <p>以前听情歌只是觉得好听，现在听情歌，每一句都像是在唱自己。喜欢一个人的时候，全世界的情歌都有了意义。她开始听懂那些以前听不懂的歌词，开始在旋律里听见自己的心跳。</p>
+      </div>
+    </div>
+    <div class="memory">
+      <div class="memory-date">那些一起挺过来的日子</div>
+      <h3 class="memory-title">你忘了吗</h3>
+      <div class="memory-text">
+        <p>后来争吵的时候，他说了一句话。</p>
+        <div class="memory-quote">"你忘了过去的一年，我们一起挺过来的。"</div>
+        <p>那些日子，他们一起面对困难，一起解决问题，一起在深夜里互相打气。那些一起挺过来的日子，不是一句话就能抹去的。它们刻在时间里，刻在彼此的生命里，成为后来无论走多远都无法否认的共同记忆。</p>
+      </div>
+    </div>
+  </section>
+  <section class="chapter">
+    <div class="chapter-header">
+      <div class="chapter-num">Chapter Three</div>
+      <h2 class="chapter-title">无声的爱</h2>
+      <div class="chapter-line"></div>
+    </div>
+    <div class="memory">
+      <div class="memory-date">2026.07.03</div>
+      <h3 class="memory-title">972元的签证费</h3>
+      <div class="memory-text">
+        <p>7月3日，她默默帮他付了签证费用，972元。他后来才发现，转账给她，她收了。但紧接着，她又把972元转回给他。</p>
+        <p>她没有说"我帮你付了"，没有说"不用还"，只是默默做了，又默默退了回来。</p>
+        <div class="memory-quote">"猪咪，好爱你呀，看的我好想哭"</div>
+        <p>最深的爱，往往是无声的。她不会说漂亮的情话，但她会用行动告诉你：我在，我帮你，不用谢。</p>
+      </div>
+    </div>
+    <div class="memory">
+      <div class="memory-date">2026.06</div>
+      <h3 class="memory-title">长春的学而思</h3>
+      <div class="memory-text">
+        <p>6月的长春，他们一起去参加学而思的培训营。住酒店，一起上课，一起在陌生的城市里走走停停。</p>
+        <div class="memory-quote">"来长春必须逛的地方之一，就是这有山！"</div>
+        <p>她像个小导游一样兴奋。后来他朋友圈看到有人去长春的这有山，说"爱你宝宝，很想你"。</p>
+        <p>一起去过的城市，会因为有那个人，而变得不一样。长春的风，长春的雨，长春的这有山，都成了他们共同的秘密。</p>
+      </div>
+    </div>
+    <div class="memory">
+      <div class="memory-date">无数个清晨</div>
+      <h3 class="memory-title">偷拍的睡颜</h3>
+      <div class="memory-text">
+        <p>7月3日的聊天记录里，她发了一张他睡觉的照片——闭着眼睛，嘴角微微上扬，睡得很安稳。</p>
+        <p>她是什么时候拍的？他不知道。但她一直存着，在某个普通的下午，发给他看。</p>
+        <p>爱一个人的时候，会忍不住偷拍他的每一个瞬间。睡觉的样子，吃饭的样子，认真做事的样子，都想存下来，在想他的时候翻出来看。</p>
+      </div>
+    </div>
+    <div class="memory">
+      <div class="memory-date">2026.09.13</div>
+      <h3 class="memory-title">就陪你</h3>
+      <div class="memory-text">
+        <p>9月13日，他给她打电话，她接了。</p>
+        <div class="memory-quote">"我不能说话" —— "就陪你"</div>
+        <p>她不能说话，可能是在宿舍，可能是不方便，可能是不知道说什么。但她没有挂电话，她选择陪着他，用沉默的方式。</p>
+        <p>有些陪伴，不需要语言。她就在那里，呼吸着，存在着，对他来说，就已经足够。</p>
+      </div>
+    </div>
+  </section>
+</div>
 <section class="ending">
-  <div class="ornament">✦ ✧ ✦</div>
+  <div class="mark">Epilogue</div>
   <h2>写在最后</h2>
-  <p>猪咪，这些星星，是我们一起走过的路。<br>有初遇时的羞涩，有并肩时的温暖，有那些无声却深沉的爱。</p>
-  <p>我们还在一起，还在走着。<br>也许有时候会吵架，会难过，会觉得走不下去。<br>但这些日子不会消失，它们会像星星一样，<br>在我们抬头的时候，闪闪发光。</p>
-  <p>如果你现在肚子疼，就把这个收藏册当成暖宝宝。<br>每一颗星星，都是一个拥抱。<br>不用回复，不用感动，只要你知道——<br>有人在你身边，希望你舒服一点，开心一点。</p>
+  <p>猪咪，这些星星，是我们一起走过的路。<br>有初遇时的羞涩，有并肩时的温暖，<br>有那些无声却深沉的爱。</p>
+  <p>我们还在一起，还在走着。<br>也许有时候会吵架，会难过，会觉得走不下去。<br>但这些日子不会消失，<br>它们会像星星一样，在我们抬头的时候，闪闪发光。</p>
+  <p>如果你现在肚子疼，<br>就把这个收藏册当成暖宝宝。<br>每一颗星星，都是一个拥抱。<br>不用回复，不用感动，<br>只要你知道——有人在你身边，<br>希望你舒服一点，开心一点。</p>
   <p class="wish">"愿你三冬暖，愿你春不寒。<br>愿你天黑有灯，下雨有伞。<br>愿你路上有良人相伴。"</p>
-  <div class="footer">— 献给最可爱的猪咪 —</div>
+  <div class="signature">— 献给最可爱的猪咪 —</div>
 </section>
 <script>
-  const container = document.getElementById('starsContainer');
-  for (let i = 0; i < 150; i++) {
+  const starsContainer = document.getElementById('stars');
+  for (let i = 0; i < 80; i++) {
     const star = document.createElement('div');
     star.className = 'star';
     star.style.left = Math.random() * 100 + '%';
     star.style.top = Math.random() * 100 + '%';
-    const size = Math.random() * 2.5 + 0.5;
+    const size = Math.random() * 1.5 + 0.5;
     star.style.width = size + 'px';
     star.style.height = size + 'px';
-    star.style.setProperty('--duration', (Math.random() * 3 + 2) + 's');
+    star.style.setProperty('--dur', (Math.random() * 4 + 3) + 's');
+    star.style.setProperty('--max-op', (Math.random() * 0.4 + 0.1).toFixed(2));
     star.style.animationDelay = Math.random() * 5 + 's';
-    container.appendChild(star);
+    starsContainer.appendChild(star);
   }
-  for (let i = 0; i < 3; i++) {
-    const meteor = document.createElement('div');
-    meteor.className = 'meteor';
-    meteor.style.left = (Math.random() * 50 + 50) + '%';
-    meteor.style.top = Math.random() * 30 + '%';
-    meteor.style.animationDelay = (i * 4 + Math.random() * 3) + 's';
-    container.appendChild(meteor);
-  }
-  document.querySelectorAll('.star-card').forEach(card => {
-    card.addEventListener('click', () => { card.classList.toggle('open'); });
-  });
   const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry, index) => {
-      if (entry.isIntersecting) {
-        setTimeout(() => { entry.target.classList.add('visible'); }, index * 100);
-      }
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) { entry.target.classList.add('visible'); }
     });
   }, { threshold: 0.1 });
-  document.querySelectorAll('.star-card').forEach(card => { observer.observe(card); });
-  window.addEventListener('scroll', () => {
-    const scrolled = window.pageYOffset;
-    const moon = document.querySelector('.moon');
-    if (moon) { moon.style.transform = `translateY(${scrolled * 0.3}px)`; }
-  });
+  document.querySelectorAll('.memory').forEach(m => { observer.observe(m); });
 </script>
 </body>
 </html>
