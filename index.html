@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>猪咪的星星收藏册</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600&family=Ma+Shan+Zheng&display=swap');
+  
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  body {
+    font-family: 'Noto Serif SC', serif;
+    background: linear-gradient(180deg, #0a0e27 0%, #1a1f3a 50%, #2d2b55 100%);
+    color: #f5e6d3;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  
+  .stars-bg {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 0;
+  }
+  
+  .star {
+    position: absolute;
+    background: #fff;
+    border-radius: 50%;
+    animation: twinkle 3s infinite ease-in-out;
+  }
+  
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.2); }
+  }
+  
+  .hero {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 2rem;
+  }
+  
+  .hero h1 {
+    font-family: 'Ma Shan Zheng', cursive;
+    font-size: clamp(2.5rem, 8vw, 5rem);
+    color: #ffd700;
+    text-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+    margin-bottom: 1rem;
+    animation: fadeInUp 2s ease-out;
+  }
+  
+  .hero .subtitle {
+    font-size: clamp(1rem, 3vw, 1.3rem);
+    color: #f5e6d3;
+    opacity: 0.8;
+    margin-bottom: 3rem;
+    animation: fadeInUp 2s ease-out 0.5s both;
+  }
+  
+  .hero .quote {
+    font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+    color: #ffb6c1;
+    font-style: italic;
+    max-width: 600px;
+    line-height: 2;
+    animation: fadeInUp 2s ease-out 1s both;
+  }
+  
+  .scroll-hint {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #ffd700;
+    animation: bounce 2s infinite;
+    font-size: 0.9rem;
+  }
+  
+  @keyframes bounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(10px); }
+  }
+  
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .collection {
+    position: relative;
+    z-index: 1;
+    padding: 4rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .section-title {
+    font-family: 'Ma Shan Zheng', cursive;
+    font-size: clamp(1.8rem, 5vw, 2.5rem);
+    color: #ffd700;
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+  
+  .stars-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+  }
+  
+  .star-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 215, 0, 0.2);
+    border-radius: 20px;
+    padding: 2rem;
+    cursor: pointer;
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .star-card::before {
+    content: '✦';
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 1.5rem;
+    color: #ffd700;
+    opacity: 0.5;
+  }
+  
+  .star-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(255, 215, 0, 0.5);
+    box-shadow: 0 10px 40px rgba(255, 215, 0, 0.2);
+  }
+  
+  .star-card .date {
+    font-size: 0.85rem;
+    color: #ffb6c1;
+    margin-bottom: 0.5rem;
+  }
+  
+  .star-card .title {
+    font-size: 1.2rem;
+    color: #ffd700;
+    margin-bottom: 1rem;
+    font-weight: 600;
+  }
+  
+  .star-card .preview {
+    font-size: 0.95rem;
+    color: #f5e6d3;
+    opacity: 0.7;
+    line-height: 1.8;
+  }
+  
+  .star-card .full-story {
+    display: none;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 215, 0, 0.2);
+    font-size: 0.95rem;
+    line-height: 2;
+    color: #f5e6d3;
+  }
+  
+  .star-card.open .full-story {
+    display: block;
+    animation: fadeIn 0.5s ease;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  .ending {
+    position: relative;
+    z-index: 1;
+    padding: 6rem 2rem;
+    text-align: center;
+    background: linear-gradient(180deg, transparent 0%, rgba(255, 182, 193, 0.1) 100%);
+  }
+  
+  .ending h2 {
+    font-family: 'Ma Shan Zheng', cursive;
+    font-size: clamp(1.8rem, 5vw, 2.5rem);
+    color: #ffb6c1;
+    margin-bottom: 2rem;
+  }
+  
+  .ending p {
+    font-size: clamp(1rem, 2.5vw, 1.2rem);
+    line-height: 2.5;
+    max-width: 700px;
+    margin: 0 auto 1rem;
+    color: #f5e6d3;
+  }
+  
+  .ending .wish {
+    margin-top: 3rem;
+    font-size: 1.1rem;
+    color: #ffd700;
+    font-style: italic;
+  }
+  
+  .moon {
+    position: fixed;
+    top: 10%;
+    right: 10%;
+    width: 80px;
+    height: 80px;
+    background: radial-gradient(circle at 30% 30%, #fffacd, #ffd700);
+    border-radius: 50%;
+    box-shadow: 0 0 60px rgba(255, 215, 0, 0.4);
+    z-index: 0;
+    opacity: 0.8;
+  }
+  
+  @media (max-width: 768px) {
+    .stars-grid {
+      grid-template-columns: 1fr;
+    }
+    .moon {
+      width: 50px;
+      height: 50px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="stars-bg" id="starsBg"></div>
+<div class="moon"></div>
+
+<section class="hero">
+  <h1>猪咪的星星收藏册</h1>
+  <p class="subtitle">— 那些被风记住的日子 —</p>
+  <p class="quote">
+    "每个人都是一颗星星，<br>
+    而有些相遇，是星星之间的引力。<br>
+    我把这些日子折成纸飞机，<br>
+    让它们在夜空中闪闪发光。"
+  </p>
+  <div class="scroll-hint">↓ 向下滑动，收集星星 ↓</div>
+</section>
+
+<section class="collection">
+  <h2 class="section-title">✦ 第一辑：初遇的光 ✦</h2>
+  <div class="stars-grid">
+    
+    <div class="star-card" onclick="this.classList.toggle('open')">
+      <div class="date">2024.10.11</div>
+      <div class="title">学长好</div>
+      <div class="preview">那是一个普通的傍晚，一条消息穿越了屏幕，也穿越了后来所有的日子。</div>
+      <div class="full-story">
+        她发来"学长好！请问能了解一下应聘督学岗位和主编岗位吗"，带着小心翼翼的礼貌。他不知道，这个问问题的女孩，会在后来的日子里，把他的世界搅得天翻地覆，又温柔得不像话。<br><br>
+        她说"高三的时候翻重构就想大学如果有这个机会，一定要抓住"。那时候的她，眼睛里有光，对未来充满期待。而他，刚好是那个递出机会的人。
+      </div>
+    </div>
+    
+    <div class="star-card" onclick="this.classList.toggle('open')">
+      <div class="date">2024.10.12</div>
+      <div class="title">晚安学长</div>
+      <div class="preview">第一个晚安，像一颗种子，悄悄落进了土里。</div>
+      <div class="full-story">
+        凌晨，她说"睡啦！晚安学长"，带着一个爱心表情。他回复"说晚安我有点假 我睡前来拍拍你"。<br><br>
+        那时候他们还只是学长和学妹，但"拍拍你"这三个字，已经超出了普通的界限。后来的无数个夜晚，他们都说晚安，而这一句，是所有晚安的开始。
+      </div>
+    </div>
+    
+    <div class="star-card" onclick="this.classList.toggle('open')">
+      <div class="date">2024.10.13</div>
+      <div class="title">好温暖啊</div>
+      <div class="preview">她翻了他的朋友圈，说"学长阳光向上满是激情，好温暖啊"。</div>
+      <div class="full-story">
+        她说"看得好感动……有一种找到组织的激动感不知道如何表达……"，然后又说"刚刚翻了一下你的朋友圈，学长阳光向上满是激情，好温暖啊"。<br><br>
+        那时候的他，是她眼里的光。她不知道，后来她也会成为他的光，在他最黑暗的日子里，照亮他前行的路。
+      </div>
+    </div>
+    
+    <div class="star-card" onclick="this.classList.toggle('open')">
+      <div class="date">2024.10.14</div>
+      <div class="title">我喜欢你认真的样子</div>
+      <div class="preview">她说"我也特别喜欢你在追求未来的样子"、"好喜欢你认真的样子"。</div>
+      <div class="full-story">
+        那时候他们聊未来，聊梦想，聊彼此想要成为的人。她说"我也特别喜欢你在追求未来的样子"，又说"好喜欢你认真的样子"。<br><br>
+        她喜欢的，是那个奋进的、有激情的、对未来充满希望的他。而他不知道，后来的他，会在失去她之后，才重新找回那个样子。
+      </div>
+    </div>
+    
+  </div>
+</section>
+
+<section class="collection">
+  <h2 class="section-title">✦ 第二辑：并肩的暖 ✦</h2>
+  <div class="stars-grid">
+    
+    <div class="star-card" onclick="this.classList.toggle('open')">
+      <div class="date">2024.10.16</div>
+      <div class="title">图书馆的沙发</div>
+      <div class="preview">"图书馆的沙发上！两个人！头靠着头睡在一起！"</div>
+      <div class="full-story">
+        她兴奋地描述着图书馆的场景，像个发现了新大陆的孩子。那时候他们一起泡图书馆，一起学习，一起在沙发上打盹。<br><br>
+        图书馆的沙发，见证了他们最初的亲密。头靠着头，呼吸交织，那是比任何情话都更动人的瞬间。
+      </div>
+    </div>
+    
+    <div class="star-card" onclick="this.classList.toggle('open')">
+      <div class="date">2024.10.17</div>
+      <div class="title">理想主义的梦</div>
+      <div class="preview">"如果好好学习就能保研，天天跑跑步，去健身房，谈恋爱……拓展自己的爱好，做做ip，画画，搞点音乐……"</div>
+      <div class="full-story">
+        她描述着自己理想中的生活：保研、跑步、健身、谈恋爱、画画、搞音乐……她说"是不是很幼稚很理想主义~"。<br><br>
+        但他知道，这不是幼稚，这是她对生活最真诚的期待。她是一个理想主义者，相信美好，相信努力，相信两个人可以一起变得更好。
+      </div>
+    </div>
+    
+    <div class="star-card" onclick="this.classList.toggle('open')">
+      <div class="date">2024.10.18</div>
+      <div class="title">突然听懂情歌</div>
+      <div class="preview">"会突然听懂很多情歌"——她这样说。</div>
+      <div class="full-story">
+        她说"会突然听懂很多情歌"。以前听情歌只是觉得好听，现在听情歌，每一句都像是在唱自己。<br><br>
+        喜欢一个人的时候，全世界的情歌都有了意义。她开始听懂那些以前听不懂的歌词，开始在旋律里听见自己的心跳。
+      </div>
+    </div>
+    
+    <div class="star-card" onclick="this.classList.toggle('open')">
+      <div class="date">2025年的某个夜晚</div>
+      <div class="title">一起挺过来的日子</div>
+      <div class="preview">"你忘了过去的一年，我们一起挺过来的。"</div>
+      <div class="full-story">
+        后来争吵的时候，他说"你忘了过去的一年，我们一起挺过来的"。那些日子，他们一起面对困难，一起解决问题，一起在深夜里互相打气。<br><br>
+        那些一起挺过来的日子，不是一句话就能抹去的。它们刻在时间里，刻在彼此的生命里，成为后来无论走多远都无法否认的共同记忆。
+      </div>
+    </div>
+    
+  </div>
+</section>
+
+<section class="collection">
+  <h2 class="section-title">✦ 第三辑：无声的爱 ✦</h2>
+  <div class="stars-grid">
+    
+    <div class="star-card" onclick="this.classList.toggle('open')">
+      <div class="date">2026.07.03</div>
+      <div class="title">972元的签证费</div>
+      <div class="preview">她默默帮他付了签证费，收了又转回来。</div>
+      <div class="full-story">
+        7月3日，她默默帮他付了签证费用，972元。他后来才发现，转账给她，她收了。但紧接着，她又把972元转回给他。<br><br>
+        她没有说"我帮你付了"，没有说"不用还"，只是默默做了，又默默退了回来。他发现后感动地说"猪咪 好爱你呀看的我好想哭"。<br><br>
+        最深的爱，往往是无声的。她不会说漂亮的情话，但她会用行动告诉你：我在，我帮你，不用谢。
+      </div>
+    </div>
+    
+    <div class="star-card" onclick="this.classList.toggle('open')">
+      <div class="date">2026.06</div>
+      <div class="title">长春的学而思</div>
+      <div class="preview">他们一起去长春参加培训，在陌生的城市里互相依靠。</div>
+      <div class="full-story">
+        6月的长春，他们一起去参加学而思的培训营。住酒店，一起上课，一起在陌生的城市里走走停停。<br><br>
+        她发"来长春必须逛的地方之一 就是这有山！"，像个小导游一样兴奋。后来他朋友圈看到有人去长春的这有山，说"爱你宝宝 很想你"。<br><br>
+        一起去过的城市，会因为有那个人，而变得不一样。长春的风，长春的雨，长春的这有山，都成了他们共同的秘密。
+      </div>
+    </div>
+    
+    <div class="star-card" onclick="this.classList.toggle('open')">
+      <div class="date">无数个清晨</div>
+      <div class="title">偷拍的睡颜</div>
+      <div class="preview">她偷拍了他睡觉的照片，一直存着。</div>
+      <div class="full-story">
+        7月3日的聊天记录里，她发了一张他睡觉的照片——闭着眼睛，嘴角微微上扬，睡得很安稳。<br><br>
+        她是什么时候拍的？他不知道。但她一直存着，在某个普通的下午，发给他看。<br><br>
+        爱一个人的时候，会忍不住偷拍他的每一个瞬间。睡觉的样子，吃饭的样子，认真做事的样子，都想存下来，在想他的时候翻出来看。
+      </div>
+    </div>
+    
+    <div class="star-card" onclick="this.classList.toggle('open')">
+      <div class="date">2026.09.13</div>
+      <div class="title">就陪你</div>
+      <div class="preview">分手后，她说"就陪你"，虽然不能说话。</div>
+      <div class="full-story">
+        9月13日，分手后的第九天。他给她打电话，她接了。她说"我不能说话"，但又说"就陪你"。<br><br>
+        她不能说话，可能是在宿舍，可能是不方便，可能是不知道说什么。但她没有挂电话，她选择陪着他，用沉默的方式。<br><br>
+        有些陪伴，不需要语言。她就在那里，呼吸着，存在着，对他来说，就已经足够。
+      </div>
+    </div>
+    
+  </div>
+</section>
+
+<section class="ending">
+  <h2>✦ 写在最后 ✦</h2>
+  <p>
+    猪咪，这些星星，是我们一起走过的路。<br>
+    有初遇时的羞涩，有并肩时的温暖，有那些无声却深沉的爱。<br><br>
+    也许现在的我们，走在不同的路上。<br>
+    但这些日子，不会因为距离就消失。<br>
+    它们会像星星一样，在你抬头的时候，闪闪发光。
+  </p>
+  <p>
+    如果你现在肚子疼，就把这个收藏册当成暖宝宝。<br>
+    每一颗星星，都是一个拥抱。<br>
+    不用回复，不用感动，只要你知道——<br>
+    有人在很远的地方，希望你舒服一点，开心一点。
+  </p>
+  <p class="wish">
+    "愿你三冬暖，愿你春不寒。<br>
+    愿你天黑有灯，下雨有伞。<br>
+    愿你路上有良人相伴。"
+  </p>
+</section>
+
+<script>
+  const starsBg = document.getElementById('starsBg');
+  for (let i = 0; i < 100; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    star.style.left = Math.random() * 100 + '%';
+    star.style.top = Math.random() * 100 + '%';
+    star.style.width = Math.random() * 3 + 1 + 'px';
+    star.style.height = star.style.width;
+    star.style.animationDelay = Math.random() * 3 + 's';
+    star.style.animationDuration = (Math.random() * 2 + 2) + 's';
+    starsBg.appendChild(star);
+  }
+  
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.1 });
+  
+  document.querySelectorAll('.star-card').forEach(card => {
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(30px)';
+    card.style.transition = 'all 0.6s ease';
+    observer.observe(card);
+  });
+</script>
+
+</body>
+</html>
